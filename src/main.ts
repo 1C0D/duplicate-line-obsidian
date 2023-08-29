@@ -1,54 +1,16 @@
 import {
-	App,
 	Editor,
 	EditorChange,
 	EditorRange,
 	EditorSelection,
 	EditorTransaction,
 	Plugin,
-	PluginSettingTab,
-	Setting,
 } from "obsidian";
 import { sortBy } from "lodash";
+import { DuplicateLineSettings } from "./settings";
+import { DEFAULT_SETTINGS, Direction, commandsToCreate, dupliSettings } from "./types";
 
-enum Direction {
-	Up,
-	Down,
-	SelDown,
-	SelUp,
-	Left,
-	Right,
-	RightDown,
-}
 
-interface dupliSettings {
-	addSpaceBetween: boolean;
-	lineDown: boolean;
-	lineUP: boolean;
-	moveRight: boolean;
-	moveLeft: boolean;
-	selectionUp: boolean;
-	selectionDown: boolean;
-	mixRightDown: boolean
-}
-
-const DEFAULT_SETTINGS: dupliSettings = {
-	addSpaceBetween: true,
-	lineDown: true,
-	lineUP: true,
-	moveRight: true,
-	moveLeft: true,
-	selectionUp: true,
-	selectionDown: true,
-	mixRightDown: false,
-};
-
-interface CommandConfig {
-	id: string;
-	name: string;
-	direction: Direction;
-	condition: boolean;
-}
 export default class DuplicateLine extends Plugin {
 	settings: dupliSettings
 	newDirection: Direction | null
@@ -60,23 +22,13 @@ export default class DuplicateLine extends Plugin {
 	}
 
 	createCommandsFromSettings() {
-		const commandsToCreate: Array<CommandConfig> = [
-			{ id: "duplicate-line", name: "Duplicate Line Down", direction: Direction.Down, condition: this.settings.lineDown },
-			{ id: "duplicate-line-up", name: "Duplicate Line Up", direction: Direction.Up, condition: this.settings.lineUP },
-			{ id: "duplicate-selection-down", name: "Duplicate Selection Down", direction: Direction.SelDown, condition: this.settings.selectionDown },
-			{ id: "duplicate-selection-up", name: "Duplicate Selection Up", direction: Direction.SelUp, condition: this.settings.selectionUp },
-			{ id: "duplicate-line-right", name: "Duplicate Selection Right", direction: Direction.Right, condition: this.settings.moveRight },
-			{ id: "duplicate-line-left", name: "Duplicate Selection Left", direction: Direction.Left, condition: this.settings.moveLeft },
-			{ id: "duplicate-line-right-down", name: "Duplicate Selection Right Line Down", direction: Direction.RightDown, condition: this.settings.mixRightDown }
-		];
-
 		commandsToCreate.forEach(commandConfig => {
 			this.addCommand({
 				id: commandConfig.id,
 				name: commandConfig.name,
 				editorCheckCallback: (checking: boolean, editor) => {
-					console.log("commandConfig.condition", commandConfig.condition)
-					if (commandConfig.condition) {
+					console.log("this.settings[commandConfig.condition]", this.settings[commandConfig.condition])
+					if (this.settings[commandConfig.condition]) {
 						if (!checking) {
 							this.duplicateLine(editor, commandConfig.direction)
 						}
@@ -88,11 +40,11 @@ export default class DuplicateLine extends Plugin {
 		});
 	}
 
+
 	async loadSettings() {
 		this.settings = {
-			... await this.loadData(),
-			DEFAULT_SETTINGS
-		}
+			...DEFAULT_SETTINGS, ...await this.loadData()
+		}		
 	}
 
 	async saveSettings() {
@@ -159,6 +111,7 @@ console.log("selection", selection)
 					break;
 
 				case Direction.Up:
+					console.log("Up")
 					newAnchor = {
 						line: selection.anchor.line + addedLines,
 						ch: selection.anchor.ch,
@@ -408,43 +361,3 @@ console.log("selection", selection)
 }
 
 
-class DuplicateLineSettings extends PluginSettingTab {
-	constructor(app: App, public plugin: DuplicateLine) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const { containerEl } = this;
-		containerEl.empty();
-		containerEl.createEl('h2', { text: 'Duplicate Line' });
-
-		new Setting(containerEl)
-			.setName("Add a space before right duplication")
-			.setDesc("eg: 'xyz xyz, to avoid to have to insert a space")
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settings.addSpaceBetween)
-					.onChange((value) => {
-						this.plugin.settings.addSpaceBetween = value;
-						this.plugin.saveSettings();
-					})
-			});
-
-		const settingsToConfigure: Array<keyof dupliSettings> = ['lineDown', 'lineUP', 'moveRight', 'moveLeft', 'selectionUp', 'selectionDown', 'mixRightDown'];
-
-		settingsToConfigure.forEach(settingName => {
-			new Setting(containerEl)
-				.setName(`duplicate ${settingName}`)
-				.addToggle((toggle) => {
-					toggle
-						.setValue(this.plugin.settings[settingName])
-						.onChange((value) => {
-							this.plugin.settings[settingName] = value;
-							this.plugin.createCommandsFromSettings()
-							this.plugin.saveSettings();
-						});
-				});
-		});
-	}
-}
