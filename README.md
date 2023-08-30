@@ -9,4 +9,6 @@ All commands can be enabled/disabled in settings
 Another command, disabled by default, is a mix between duplicate line down and selection right.  
 When no selection, duplicate down. when selection duplicate selection right. (feature request...)
 
+![demo](duplicate_line_demo.gif)
+
 
