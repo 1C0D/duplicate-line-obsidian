@@ -9,7 +9,7 @@ export function selectionToLine(
 ): EditorRange {
     let range = selectionToRange(selection, true);
     const { from, to } = range
-    const isEmptySelection = (from.ch === to.ch) && (from.line === to.line);
+    const isEmptySelection = isNoSelection(selection);
     const toLength = editor.getLine(range.to.line).length
 
     if (direction === Direction.Up || direction === Direction.Down) {
@@ -62,6 +62,11 @@ export function selectionToLine(
 
 export function areObjectsEqual(obj1: any, obj2: any) {
     return obj1.line === obj2.line && obj1.ch === obj2.ch;
+}
+
+export function isNoSelection(selection: EditorSelection) {
+    const { anchor, head } = selection
+    return (anchor.ch === head.ch) && (anchor.line === head.line)
 }
 
 export function selectionToRange(selection: EditorSelection, sort?: boolean): EditorRange {

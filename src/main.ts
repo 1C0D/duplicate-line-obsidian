@@ -9,7 +9,7 @@ import {
 import { sortBy } from "lodash";
 import { DuplicateLineSettings } from "./settings";
 import { DEFAULT_SETTINGS, Direction, commandsToCreate, dupliSettings } from "./types";
-import { areObjectsEqual, selectionToLine, selectionToRange } from "./utils";
+import { areObjectsEqual, isNoSelection, selectionToLine, selectionToRange } from "./utils";
 
 
 export default class DuplicateLine extends Plugin {
@@ -84,9 +84,12 @@ export default class DuplicateLine extends Plugin {
 			}
 			addedLines += numberOfLines;
 			const { anchor, head } = selection
+			const { from, to } = range
 			const sameDirection = areObjectsEqual(head, range.to)
-			const areEqual = areObjectsEqual(head, range.to)
-			const toLength = editor.getLine(range.to.line).length
+			const isEmptySelection = isNoSelection(selection)
+			const toLength = editor.getLine(to.line).length
+			const headLength = editor.getLine(head.line).length
+			const anchorLength = editor.getLine(anchor.line).length
 
 			switch (direction) {
 				case Direction.Down:
@@ -102,8 +105,8 @@ export default class DuplicateLine extends Plugin {
 
 					{
 						change = {
-							from: range.to,
-							to: range.to,
+							from: to,
+							to: to,
 							text: "\n" + content,
 						};
 					}
@@ -122,8 +125,8 @@ export default class DuplicateLine extends Plugin {
 
 					{
 						change = {
-							from: range.from,
-							to: range.from,
+							from: from,
+							to: from,
 							text: content + "\n",
 						};
 					}
@@ -143,8 +146,8 @@ export default class DuplicateLine extends Plugin {
 					};
 
 					change = {
-						from: range.from,
-						to: range.from,
+						from: from,
+						to: from,
 						text: content,
 					};
 					break;
@@ -164,8 +167,8 @@ export default class DuplicateLine extends Plugin {
 					};
 
 					change = {
-						from: range.to,
-						to: range.to,
+						from: to,
+						to: to,
 						text: content,
 					};
 					break;
@@ -173,17 +176,23 @@ export default class DuplicateLine extends Plugin {
 				case Direction.SelDown: {
 					newAnchor = {
 						line: anchor.line + addedLines,
-						ch: areEqual ? toLength : sameDirection ?
-							0 : Math.abs(anchor.ch - head.ch)
+						ch: isEmptySelection ?
+							0 :
+							sameDirection ?
+								0 :
+								numberOfLines === 1 ? content.length : anchorLength
 					};
 
 					newHead = {
 						line: head.line + addedLines,
-						ch: areEqual ? toLength : sameDirection ?
-							Math.abs(anchor.ch - head.ch) : 0,
+						ch: isEmptySelection ?
+							headLength :
+							sameDirection ?
+								numberOfLines === 1 ? content.length : headLength
+								: 0,
 					};
 
-					const NewrangeLineTo = { line: range.to.line, ch: toLength }
+					const NewrangeLineTo = { line: to.line, ch: toLength }
 					{
 						change = {
 							from: NewrangeLineTo,
@@ -195,19 +204,29 @@ export default class DuplicateLine extends Plugin {
 					break;
 				}
 				case Direction.SelUp: {
+					console.log("isEmptySelection", isEmptySelection)
+					console.log("sameDirection", sameDirection)
+					console.log("numberOfLines === 1", numberOfLines === 1)
 					newAnchor = {
-						line: sameDirection ? anchor.line + addedLines - numberOfLines -1 : anchor.line + addedLines - numberOfLines,
-						ch: areEqual ? toLength : sameDirection ? 0 :
-							editor.getLine(range.from.line).length - range.from.ch,
+						line: anchor.line + addedLines - numberOfLines, 
+						ch: isEmptySelection ?
+							0 : 
+							sameDirection ?
+								0 :
+								numberOfLines === 1 ? content.length : anchorLength
 					};
 					newHead = {
-						line: head.line + addedLines - numberOfLines,
-						ch: areEqual ? toLength : sameDirection ?							
-							editor.getLine(range.to.line).length - range.to.ch
-							: 0,
+						line: sameDirection ?
+							anchor.line + addedLines -1 :
+							head.line + addedLines - numberOfLines,
+						ch: isEmptySelection ?
+							toLength :
+							sameDirection ?
+								headLength :
+								0,
 					};
 
-					const NewrangeLineFrom = { line: range.from.line, ch: 0 }
+					const NewrangeLineFrom = { line: from.line, ch: 0 }
 					{
 						change = {
 							from: NewrangeLineFrom,
@@ -218,7 +237,6 @@ export default class DuplicateLine extends Plugin {
 					break;
 				}
 				case Direction.RightDown: {
-					const isEmptySelection = (anchor.ch === head.ch) && (anchor.line === head.line);
 					if (this.settings.addSpaceBetween) content = isEmptySelection ? content : " " + content
 
 					newAnchor = {
@@ -232,8 +250,8 @@ export default class DuplicateLine extends Plugin {
 					};
 
 					change = {
-						from: range.to,
-						to: range.to,
+						from: to,
+						to: to,
 						text: isEmptySelection ? "\n" + content : content,
 					};
 					break
