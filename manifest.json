@@ -1,9 +1,9 @@
 {
 	"id": "duplicate-line",
 	"name": "Duplicate Line",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"minAppVersion": "0.15.9",
-	"description": "To duplicate line(s).Multicursor supported. duplicate down or up (set some shortcut)",
+	"description": "Duplicate Line(s) Up Down, duplicate selection Up Down, right, left. Support Multicursor",
 	"author": "1C0D",
 	"authorUrl": "https://github.com/1C0D/duplicate-line",
 	"isDesktopOnly": false

@@ -9,6 +9,7 @@ import {
 import { sortBy } from "lodash";
 import { DuplicateLineSettings } from "./settings";
 import { DEFAULT_SETTINGS, Direction, commandsToCreate, dupliSettings } from "./types";
+import { areObjectsEqual, selectionToLine, selectionToRange } from "./utils";
 
 
 export default class DuplicateLine extends Plugin {
@@ -18,7 +19,7 @@ export default class DuplicateLine extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		this.addSettingTab(new DuplicateLineSettings(this.app, this));
-		this.createCommandsFromSettings() 
+		this.createCommandsFromSettings()
 	}
 
 	createCommandsFromSettings() {
@@ -27,7 +28,6 @@ export default class DuplicateLine extends Plugin {
 				id: commandConfig.id,
 				name: commandConfig.name,
 				editorCheckCallback: (checking: boolean, editor) => {
-					console.log("this.settings[commandConfig.condition]", this.settings[commandConfig.condition])
 					if (this.settings[commandConfig.condition]) {
 						if (!checking) {
 							this.duplicateLine(editor, commandConfig.direction)
@@ -44,7 +44,7 @@ export default class DuplicateLine extends Plugin {
 	async loadSettings() {
 		this.settings = {
 			...DEFAULT_SETTINGS, ...await this.loadData()
-		}		
+		}
 	}
 
 	async saveSettings() {
@@ -57,23 +57,15 @@ export default class DuplicateLine extends Plugin {
 		const changes: EditorChange[] = [];
 		const newSelectionRanges: EditorRange[] = [];
 
-		// if (direction === Direction.RightDown) {
-		// 	selections = [{ anchor: editor.getCursor(), head: editor.getCursor() },]
-		// }
-
-		// bug outside of doc 
-
 		for (let selection of selections) {
-			const newSelection = this.selectionToLine(
+			const range = selectionToLine(
 				editor,
 				selection,
 				direction
 			);
-console.log("selection", selection)
-			const rangeLine = this.selectionToRange(newSelection, true); //already sorted
-			const numberOfLines = rangeLine.to.line - rangeLine.from.line + 1;
-			let content = editor.getRange(rangeLine.from, rangeLine.to);
-			if (!content.trim()) continue;
+			const numberOfLines = range.to.line - range.from.line + 1;
+			let content = editor.getRange(range.from, range.to);
+			if (!content.trim()) continue; // empty line
 
 			let change: EditorChange;
 			let newAnchor = {
@@ -85,47 +77,53 @@ console.log("selection", selection)
 				ch: 0,
 			};
 
+
 			if (this.newDirection) {
 				direction = this.newDirection
 				this.newDirection = null
 			}
+			addedLines += numberOfLines;
+			const { anchor, head } = selection
+			const sameDirection = areObjectsEqual(head, range.to)
+			const areEqual = areObjectsEqual(head, range.to)
+			const toLength = editor.getLine(range.to.line).length
+
 			switch (direction) {
 				case Direction.Down:
-					addedLines += numberOfLines;
 					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: selection.anchor.ch,
+						line: anchor.line + addedLines,
+						ch: anchor.ch,
 					};
+
 					newHead = {
-						line: selection.head.line + addedLines,
-						ch: selection.head.ch,
+						line: head.line + addedLines,
+						ch: head.ch,
 					};
 
 					{
 						change = {
-							from: rangeLine.to,
-							to: rangeLine.to,
+							from: range.to,
+							to: range.to,
 							text: "\n" + content,
 						};
 					}
 					break;
 
 				case Direction.Up:
-					console.log("Up")
 					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: selection.anchor.ch,
-					};
-					newHead = {
-						line: selection.head.line + addedLines,
-						ch: selection.head.ch,
+						line: anchor.line + addedLines - numberOfLines,
+						ch: anchor.ch,
 					};
 
-					addedLines += numberOfLines;
+					newHead = {
+						line: head.line + addedLines - numberOfLines,
+						ch: head.ch,
+					};
+
 					{
 						change = {
-							from: rangeLine.from,
-							to: rangeLine.from,
+							from: range.from,
+							to: range.from,
 							text: content + "\n",
 						};
 					}
@@ -133,17 +131,20 @@ console.log("selection", selection)
 
 				case Direction.Left: {
 					if (this.settings.addSpaceBetween) content = content + " "
+
 					newAnchor = {
-						line: selection.anchor.line,
-						ch: selection.anchor.ch,
+						line: anchor.line,
+						ch: anchor.ch,
 					};
+
 					newHead = {
-						line: selection.head.line,
-						ch: selection.head.ch,
+						line: head.line,
+						ch: head.ch,
 					};
+
 					change = {
-						from: rangeLine.from,
-						to: rangeLine.from,
+						from: range.from,
+						to: range.from,
 						text: content,
 					};
 					break;
@@ -151,39 +152,38 @@ console.log("selection", selection)
 
 				case Direction.Right: {
 					if (this.settings.addSpaceBetween) content = " " + content
+
 					newAnchor = {
-						line: selection.anchor.line,
-						ch: selection.anchor.ch + content.length,
+						line: anchor.line,
+						ch: anchor.ch + content.length,
 					};
+
 					newHead = {
-						line: selection.head.line,
-						ch: selection.head.ch + content.length,
+						line: head.line,
+						ch: head.ch + content.length,
 					};
+
 					change = {
-						from: rangeLine.to,
-						to: rangeLine.to,
+						from: range.to,
+						to: range.to,
 						text: content,
 					};
 					break;
 				}
 				case Direction.SelDown: {
-					addedLines += numberOfLines;
-					const toLength = editor.getLine(rangeLine.to.line).length
-					const NewrangeLineTo = { line: rangeLine.to.line, ch: toLength }
-					const condition = this.areObjectsEqual(selection.head, rangeLine.to)
-
 					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: condition ?
-							0 : Math.abs(selection.anchor.ch - selection.head.ch)
+						line: anchor.line + addedLines,
+						ch: areEqual ? toLength : sameDirection ?
+							0 : Math.abs(anchor.ch - head.ch)
 					};
 
 					newHead = {
-						line: selection.head.line + addedLines,
-						ch: condition ?
-							Math.abs(selection.anchor.ch - selection.head.ch) : 0,
+						line: head.line + addedLines,
+						ch: areEqual ? toLength : sameDirection ?
+							Math.abs(anchor.ch - head.ch) : 0,
 					};
 
+					const NewrangeLineTo = { line: range.to.line, ch: toLength }
 					{
 						change = {
 							from: NewrangeLineTo,
@@ -195,26 +195,19 @@ console.log("selection", selection)
 					break;
 				}
 				case Direction.SelUp: {
-					addedLines += numberOfLines;
-					const condition = this.areObjectsEqual(selection.head, rangeLine.to)
-					const NewrangeLineFrom = { line: rangeLine.from.line, ch: 0 }
 					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: condition ? 0 : Math.abs(selection.anchor.ch - selection.head.ch),
+						line: sameDirection ? anchor.line + addedLines - numberOfLines -1 : anchor.line + addedLines - numberOfLines,
+						ch: areEqual ? toLength : sameDirection ? 0 :
+							editor.getLine(range.from.line).length - range.from.ch,
 					};
 					newHead = {
-						line: selection.head.line + addedLines,
-						ch: condition ? Math.abs(selection.anchor.ch - selection.head.ch) : 0,
-					};
-					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: selection.anchor.ch,
-					};
-					newHead = {
-						line: selection.head.line + addedLines,
-						ch: selection.head.ch,
+						line: head.line + addedLines - numberOfLines,
+						ch: areEqual ? toLength : sameDirection ?							
+							editor.getLine(range.to.line).length - range.to.ch
+							: 0,
 					};
 
+					const NewrangeLineFrom = { line: range.from.line, ch: 0 }
 					{
 						change = {
 							from: NewrangeLineFrom,
@@ -225,39 +218,30 @@ console.log("selection", selection)
 					break;
 				}
 				case Direction.RightDown: {
-					addedLines += numberOfLines;
-					const condition = this.areObjectsEqual(selection.head, rangeLine.to)
-					const NewrangeLineFrom = { line: rangeLine.from.line, ch: 0 }
+					const isEmptySelection = (anchor.ch === head.ch) && (anchor.line === head.line);
+					if (this.settings.addSpaceBetween) content = isEmptySelection ? content : " " + content
+
 					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: condition ? 0 : Math.abs(selection.anchor.ch - selection.head.ch),
-					};
-					newHead = {
-						line: selection.head.line + addedLines,
-						ch: condition ? Math.abs(selection.anchor.ch - selection.head.ch) : 0,
-					};
-					newAnchor = {
-						line: selection.anchor.line + addedLines,
-						ch: selection.anchor.ch,
-					};
-					newHead = {
-						line: selection.head.line + addedLines,
-						ch: selection.head.ch,
+						line: anchor.line,
+						ch: isEmptySelection ? toLength : anchor.ch + content.length,
 					};
 
-					{
-						change = {
-							from: NewrangeLineFrom,
-							to: NewrangeLineFrom,
-							text: content + "\n",
-						};
-					}
-					break;
+					newHead = {
+						line: head.line,
+						ch: isEmptySelection ? toLength : head.ch + content.length,
+					};
+
+					change = {
+						from: range.to,
+						to: range.to,
+						text: isEmptySelection ? "\n" + content : content,
+					};
+					break
 				}
 			}
 
 			newSelectionRanges.push(
-				this.selectionToRange({
+				selectionToRange({
 					anchor: newAnchor,
 					head: newHead,
 				})
@@ -277,87 +261,6 @@ console.log("selection", selection)
 		}
 	};
 
-	areObjectsEqual(obj1: any, obj2: any) {
-		return obj1.line === obj2.line && obj1.ch === obj2.ch;
-	}
-
-	selectionToRange(selection: EditorSelection, sort?: boolean): EditorRange {
-		const positions = [selection.anchor, selection.head];
-		let sorted = positions;
-		if (sort) {
-			sorted = sortBy(positions, ["line", "ch"]);
-		}
-		return {
-			from: sorted[0],
-			to: sorted[1],
-		};
-	}
-
-	selectionToLine(
-		editor: Editor,
-		selection: EditorSelection,
-		direction: Direction
-	): EditorSelection {
-		const range = this.selectionToRange(selection, true); // {from:{line: 11, ch: 0} to:{line: 12...
-		const vertical: boolean = direction === Direction.Up || direction === Direction.Down;
-		const isEmptySelection = (selection.anchor.ch === selection.head.ch) && (selection.anchor.line === selection.head.line);
-		const toLength = editor.getLine(range.to.line).length
-
-		if (vertical) {
-			const newSelection: EditorSelection = {
-				anchor: { line: range.from.line, ch: 0 },
-				head: { line: range.to.line, ch: toLength },
-			};
-			return newSelection;
-
-		} else if (direction === Direction.SelDown) {
-			return selection;
-		}
-		else if (direction === Direction.RightDown) {
-			if (isEmptySelection) {
-				const newSelection: EditorSelection = {
-					anchor: { line: range.to.line, ch: 0 },
-					head: { line: range.to.line, ch: toLength },
-				};
-				this.newDirection = Direction.Down
-				return newSelection
-			} else {
-				this.newDirection = Direction.Right
-				return {
-					anchor: range.from,
-					head: range.to,
-				};
-			}
-		}
-		else {
-			// no selection (testing word before cursor)
-			if (isEmptySelection) {
-				const line = range.from.line
-				const ch = range.from.ch
-				if (ch > 0) {
-					const currentLine = editor.getLine(line)
-					// find previous word (thks GPT)
-					let startOfWord = ch - 1;
-					while (startOfWord >= 0 && /\S/.test(currentLine[startOfWord])) {
-						startOfWord--;
-					}
-					startOfWord++;
-					// extract previous word
-					const contentLength = currentLine.slice(startOfWord, ch).length;
-					const newSelection: EditorSelection = {
-						anchor: { line: line, ch: (ch - contentLength) },
-						head: { line: line, ch: (ch) },
-					};
-					return newSelection
-				}
-
-			}
-			return {
-				anchor: editor.getCursor("from"),
-				head: editor.getCursor("to"),
-			};
-		}
-	}
 }
 
 

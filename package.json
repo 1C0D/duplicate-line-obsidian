@@ -1,7 +1,7 @@
 {
 	"name": "duplicate-line",
-	"version": "1.5.0",
-	"description": "To duplicate line(s).Multicursor supported. duplicate down or up (set some shortcut)",
+	"version": "1.6.0",
+	"description": "Duplicate Line(s) Up Down, duplicate selection Up Down, right, left. Support Multicursor",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

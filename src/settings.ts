@@ -27,14 +27,15 @@ export class DuplicateLineSettings extends PluginSettingTab {
 
 
         commandsToCreate.forEach(commandConfig => {
-            new Setting(containerEl)
+            const setting = new Setting(containerEl)
                 .setName(commandConfig.name)
-                .addToggle((toggle) => {
+            if (commandConfig.condition === "mixRightDown")
+                setting.setDesc("if no selection: duplicate line down, else duplicate selection right ")
+            setting.addToggle((toggle) => {
                     toggle
                         .setValue(this.plugin.settings[commandConfig.condition])
                         .onChange(async (value) => {
-                            this.plugin.settings[commandConfig.id] = value;
-                            // this.plugin.createCommandsFromSettings()
+                            this.plugin.settings[commandConfig.condition] = value;
                             await this.plugin.saveSettings();
                         });
                 });
