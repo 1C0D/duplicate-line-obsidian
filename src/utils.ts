@@ -1,4 +1,4 @@
-import { Editor, EditorRange, EditorSelection } from "obsidian";
+import { Editor, EditorRange, EditorSelection, EditorSelectionOrCaret } from "obsidian";
 import { Direction } from "./types";
 import { sortBy } from "lodash";
 

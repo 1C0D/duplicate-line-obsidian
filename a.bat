@@ -1,6 +1,6 @@
 @echo on
 IF EXIST "src/main.ts" (
-    start /B code src/main.ts
+    start /B code src
 ) ELSE (
     start /B code main.ts
 )
