@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import DuplicateLine from "./main";
-import { commandsToCreate } from "./types";
+import { commandsToCreate, dupliSettings } from "./types";
 
 export class DuplicateLineSettings extends PluginSettingTab {
     constructor(app: App, public plugin: DuplicateLine) {
@@ -33,11 +33,17 @@ export class DuplicateLineSettings extends PluginSettingTab {
                 setting.setDesc("if no selection: duplicate line down, else duplicate selection right ")
             setting.addToggle((toggle) => {
                     toggle
-                        .setValue(this.plugin.settings[commandConfig.condition])
-                        .onChange(async (value) => {
-                            this.plugin.settings[commandConfig.condition] = value;
-                            await this.plugin.saveSettings();
-                        });
+						.setValue(
+							this.plugin.settings[
+								commandConfig.condition as keyof dupliSettings
+							]
+						)
+						.onChange(async (value) => {
+							this.plugin.settings[
+								commandConfig.condition as keyof dupliSettings
+							] = value;
+							await this.plugin.saveSettings();
+						});
                 });
         });
     }

@@ -35,7 +35,8 @@ export default class DuplicateLine extends Plugin {
 			id: "select-next-occurence",
 			name: "Select next occurence",
 			editorCallback: (editor) => {
-				addNextOccurence(editor);}
+				addNextOccurence(editor);
+			},
 		});
 	}
 
@@ -45,7 +46,11 @@ export default class DuplicateLine extends Plugin {
 				id: commandConfig.id,
 				name: commandConfig.name,
 				editorCheckCallback: (checking: boolean, editor) => {
-					if (this.settings[commandConfig.condition]) {
+
+					const condition = commandConfig.condition;
+					const conditionValue =
+						this.settings[condition as keyof dupliSettings];
+					if (conditionValue) {
 						if (!checking) {
 							this.duplicateLine(editor, commandConfig.direction);
 						}
