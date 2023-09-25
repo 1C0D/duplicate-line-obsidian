@@ -19,6 +19,8 @@ export interface dupliSettings {
 	selectionUp: boolean;
 	selectionDown: boolean;
 	mixRightDown: boolean;
+	addNextOcc: boolean;
+	selAllOcc: boolean;
 }
 
 export const DEFAULT_SETTINGS: dupliSettings = {
@@ -30,12 +32,14 @@ export const DEFAULT_SETTINGS: dupliSettings = {
 	selectionUp: true,
 	selectionDown: true,
 	mixRightDown: false,
+	addNextOcc: true,
+	selAllOcc: true,
 };
 
 export interface CommandConfig {
 	id: string;
 	name: string;
-	direction: Direction;
+	direction: Direction | null;
 	condition: string;
 }
 
@@ -81,6 +85,18 @@ export const commandsToCreate: Array<CommandConfig> = [
 		name: "Selection Right Line Down",
 		direction: Direction.RightDown,
 		condition: "mixRightDown",
+	},
+	{
+		id: "select-next-occurence",
+		name: "Add next occurence",
+		direction: null,
+		condition: "addNextOcc",
+	},
+	{
+		id: "select-all-occurence",
+		name: "Select all occurences",
+		direction: null,
+		condition: "selAllOcc",
 	},
 ];
 

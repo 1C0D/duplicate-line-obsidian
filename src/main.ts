@@ -1,13 +1,10 @@
 import {
 	Editor,
 	EditorChange,
-	EditorPosition,
 	EditorRange,
-	EditorSelection,
 	EditorTransaction,
 	Plugin,
 } from "obsidian";
-import { sortBy } from "lodash";
 import { DuplicateLineSettings } from "./settings";
 import {
 	DEFAULT_SETTINGS,
@@ -21,7 +18,8 @@ import {
 	selectionToLine,
 	selectionToRange,
 } from "./utils";
-import { addNextOccurence } from "./selectNextOccurence";
+import { addNextOccurrence } from "./AddNextOccurrence";
+import { addAllOccurrences } from "./AddAllOccurrences";
 
 export default class DuplicateLine extends Plugin {
 	settings: dupliSettings;
@@ -31,13 +29,6 @@ export default class DuplicateLine extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new DuplicateLineSettings(this.app, this));
 		this.createCommandsFromSettings();
-		this.addCommand({
-			id: "select-next-occurence",
-			name: "Select next occurence",
-			editorCallback: (editor) => {
-				addNextOccurence(editor);
-			},
-		});
 	}
 
 	createCommandsFromSettings() {
@@ -46,13 +37,20 @@ export default class DuplicateLine extends Plugin {
 				id: commandConfig.id,
 				name: commandConfig.name,
 				editorCheckCallback: (checking: boolean, editor) => {
-
 					const condition = commandConfig.condition;
 					const conditionValue =
 						this.settings[condition as keyof dupliSettings];
 					if (conditionValue) {
 						if (!checking) {
-							this.duplicateLine(editor, commandConfig.direction);
+							if (commandConfig.direction)
+								this.duplicateLine(
+									editor,
+									commandConfig.direction
+								);
+							else if (condition === "addNextOcc")
+								addNextOccurrence(editor);
+							else if (condition === "selAllOcc")
+								addAllOccurrences(editor);
 						}
 						return true;
 					}
