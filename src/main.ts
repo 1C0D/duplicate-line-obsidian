@@ -42,7 +42,7 @@ export default class DuplicateLine extends Plugin {
 						this.settings[condition as keyof dupliSettings];
 					if (conditionValue) {
 						if (!checking) {
-							if (commandConfig.direction)
+							if (commandConfig.direction != null)
 								this.duplicateLine(
 									editor,
 									commandConfig.direction
