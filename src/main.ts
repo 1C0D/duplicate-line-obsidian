@@ -38,6 +38,7 @@ export default class DuplicateLine extends Plugin {
 			this.addCommand({
 				id: commandConfig.id,
 				name: commandConfig.name,
+				icon: commandConfig.icon,
 				editorCheckCallback: (checking: boolean, editor) => {
 					const condition = commandConfig.condition;
 					const conditionValue =

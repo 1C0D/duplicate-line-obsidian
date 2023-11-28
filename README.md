@@ -18,7 +18,7 @@ Duplicate Selection Right/Line Down (feature request). When no selection duplica
   
 Selection can be multiline and multicursors  
 if no selection the word before or under cursor is selected, when using selection operations  
-if no selection whole line is used, when using duplicate operations. if selection multiline then duplicate   multiline... it's quite intuitive, make some tries  
+if no selection, the whole line is used, when using duplicate operations. if selection multiline then duplicate   multiline... it's quite intuitive, make some tries  
   
 All commands can be enabled/disabled in settings.  
   
