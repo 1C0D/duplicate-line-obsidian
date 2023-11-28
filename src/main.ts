@@ -1,3 +1,5 @@
+// todo improve add remove commands (hotkey are still visibles)
+// add recommanded hotkeys in settings desc
 import {
 	Editor,
 	EditorChange,
@@ -42,11 +44,17 @@ export default class DuplicateLine extends Plugin {
 						this.settings[condition as keyof dupliSettings];
 					if (conditionValue) {
 						if (!checking) {
-							if (commandConfig.direction != null)
-								this.duplicateLine(
+							if (commandConfig.direction != null) {
+								if (condition === "moveRight" || condition === "moveLeft") this.directionalMove(
 									editor,
 									commandConfig.direction
-								);
+								)
+								else
+									this.duplicateLine(
+										editor,
+										commandConfig.direction
+									);
+							}
 							else if (condition === "addNextOcc")
 								addNextOccurrence(editor);
 							else if (condition === "selAllOcc")
@@ -194,10 +202,10 @@ export default class DuplicateLine extends Plugin {
 						ch: isEmptySelection
 							? 0
 							: sameDirection
-							? 0
-							: numberOfLines === 1
-							? content.length
-							: anchorLength,
+								? 0
+								: numberOfLines === 1
+									? content.length
+									: anchorLength,
 					};
 
 					newHead = {
@@ -205,10 +213,10 @@ export default class DuplicateLine extends Plugin {
 						ch: isEmptySelection
 							? headLength
 							: sameDirection
-							? numberOfLines === 1
-								? content.length
-								: headLength
-							: 0,
+								? numberOfLines === 1
+									? content.length
+									: headLength
+								: 0,
 					};
 
 					const NewrangeLineTo = { line: to.line, ch: toLength };
@@ -223,18 +231,15 @@ export default class DuplicateLine extends Plugin {
 					break;
 				}
 				case Direction.SelUp: {
-					console.log("isEmptySelection", isEmptySelection);
-					console.log("sameDirection", sameDirection);
-					console.log("numberOfLines === 1", numberOfLines === 1);
 					newAnchor = {
 						line: anchor.line + addedLines - numberOfLines,
 						ch: isEmptySelection
 							? 0
 							: sameDirection
-							? 0
-							: numberOfLines === 1
-							? content.length
-							: anchorLength,
+								? 0
+								: numberOfLines === 1
+									? content.length
+									: anchorLength,
 					};
 					newHead = {
 						line: sameDirection
@@ -243,8 +248,8 @@ export default class DuplicateLine extends Plugin {
 						ch: isEmptySelection
 							? toLength
 							: sameDirection
-							? headLength
-							: 0,
+								? headLength
+								: 0,
 					};
 
 					const NewrangeLineFrom = { line: from.line, ch: 0 };
@@ -304,4 +309,79 @@ export default class DuplicateLine extends Plugin {
 			editor.transaction(transaction, origin);
 		}
 	};
+
+	directionalMove = (
+		editor: Editor,
+		direction: Direction,
+	): void => {
+		const selections = editor.listSelections()
+		const changes: Array<EditorChange> = []
+		for (const selection of selections) {
+			if (isNoSelection(selection)) continue
+			const range = selectionToRange(selection, true)
+			let additionChange: EditorChange
+			let deletionChange: EditorChange
+			switch (direction) {
+				case Direction.Left: {
+					const isStart = (range.from.line === 0 && range.from.ch === 0)
+					const isLineStart = range.from.ch === 0
+					// if ()
+					deletionChange = {
+						from: isStart ? {
+							line: range.from.line,
+							ch: range.from.ch,
+						} : isLineStart ? {
+							line: range.from.line - 1,
+							ch: editor.getLine(range.from.line - 1).length - 1,
+						} : {
+							line: range.from.line,
+							ch: range.from.ch - 1,
+						},
+						to: range.from,
+						text: '',
+					}
+
+					additionChange = {
+						from: range.to,
+						to: range.to,
+						text: editor.getRange(deletionChange.from, deletionChange.to!),
+					}
+					break
+				}
+				case Direction.Right: {
+					const isExtrem = (range.to.line === editor.lastLine() && range.to.ch === editor.getLine(range.to.line).length)
+
+					deletionChange = {
+						from: range.to,
+						to: isExtrem ? {
+							line: range.to.line,
+							ch: range.to.ch,
+						} : {
+							line: range.to.line,
+							ch: range.to.ch + 1,
+						},
+						text: '',
+					}
+
+					additionChange = {
+						from: range.from,
+						to: range.from,
+						text: editor.getRange(deletionChange.from, deletionChange.to!),
+					}
+					break
+				}
+			}
+			//@ts-ignore
+			changes.push(deletionChange, additionChange)
+		}
+
+		if (changes.length > 0) {
+			const transaction: EditorTransaction = {
+				changes: changes,
+			}
+
+			const origin = 'DirectionalMove_' + String(direction)
+			editor.transaction(transaction, origin)
+		}
+	}
 }

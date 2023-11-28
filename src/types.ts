@@ -14,6 +14,8 @@ export interface dupliSettings {
 	addSpaceBetween: boolean;
 	lineDown: boolean;
 	lineUp: boolean;
+	moveRight: boolean;
+	moveLeft: boolean;
 	selectionRight: boolean;
 	selectionLeft: boolean;
 	selectionUp: boolean;
@@ -27,6 +29,8 @@ export const DEFAULT_SETTINGS: dupliSettings = {
 	addSpaceBetween: true,
 	lineDown: true,
 	lineUp: true,
+	moveRight: true,
+	moveLeft: true,
 	selectionRight: true,
 	selectionLeft: true,
 	selectionUp: true,
@@ -39,6 +43,7 @@ export const DEFAULT_SETTINGS: dupliSettings = {
 export interface CommandConfig {
 	id: string;
 	name: string;
+	icon: string;
 	direction: Direction | null;
 	condition: string;
 }
@@ -46,55 +51,78 @@ export interface CommandConfig {
 export const commandsToCreate: Array<CommandConfig> = [
 	{
 		id: "duplicate-line",
-		name: "Line Down",
+		name: "Duplicate Line Down",
+		icon: "arrow-down-from-line",
 		direction: Direction.Down,
 		condition: "lineDown",
 	},
 	{
 		id: "duplicate-line-up",
-		name: "Line Up",
+		name: "Duplicate Line Up",
+		icon: "arrow-up-from-line",
 		direction: Direction.Up,
 		condition: "lineUp",
 	},
 	{
 		id: "duplicate-selection-down",
-		name: "Selection Down",
+		name: "Duplicate Selection Down",
+		icon: "arrow-down",
 		direction: Direction.SelDown,
 		condition: "selectionDown",
 	},
 	{
 		id: "duplicate-selection-up",
-		name: "Selection Up",
+		name: "Duplicate Selection Up",
+		icon: "arrow-up",
 		direction: Direction.SelUp,
 		condition: "selectionUp",
 	},
 	{
 		id: "duplicate-line-right",
-		name: "Selection Right",
+		name: "Duplicate Selection Right",
+		icon: "arrow-right-from-line",
 		direction: Direction.Right,
 		condition: "selectionRight",
 	},
-	{
-		id: "duplicate-line-left",
-		name: "Selection Left",
-		direction: Direction.Left,
-		condition: "selectionLeft",
-	},
+	// {
+	// 	id: "duplicate-line-left",
+	// 	name: "Selection Left",
+	// 	icon: "any icon name here",
+	// 	direction: Direction.Left,
+	// 	condition: "selectionLeft",
+	// },
 	{
 		id: "duplicate-line-right-down",
-		name: "Selection Right Line Down",
+		name: "Duplicate Selection Right/Line Down",
+		icon: "arrow-down-right",
 		direction: Direction.RightDown,
 		condition: "mixRightDown",
 	},
 	{
+		id: "directional-move-right",
+		name: "Move Right",
+		icon: "arrow-right",
+		direction: Direction.Right,
+		condition: "moveRight",
+	},
+	{
+		id: "directional-move-left",
+		name: "Move Left",
+		icon: "arrow-left",
+		direction: Direction.Left,
+		condition: "moveLeft",
+	},
+	{
 		id: "select-next-occurence",
 		name: "Add next occurence",
+		icon: "arrow-down-narrow-wide",
 		direction: null,
 		condition: "addNextOcc",
 	},
 	{
 		id: "select-all-occurence",
 		name: "Select all occurences",
+		icon: "bar-chart-horizontal",
 		direction: null,
 		condition: "selAllOcc",
 	},
