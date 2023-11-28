@@ -9,6 +9,7 @@ import {
 } from "obsidian";
 import { DuplicateLineSettings } from "./settings";
 import {
+	CommandConfig,
 	DEFAULT_SETTINGS,
 	Direction,
 	commandsToCreate,
@@ -28,6 +29,7 @@ export default class DuplicateLine extends Plugin {
 	newDirection: Direction | null;
 
 	async onload() {
+		console.log("tuttut")
 		await this.loadSettings();
 		this.addSettingTab(new DuplicateLineSettings(this.app, this));
 		this.createCommandsFromSettings();
@@ -35,39 +37,34 @@ export default class DuplicateLine extends Plugin {
 
 	createCommandsFromSettings() {
 		commandsToCreate.forEach((commandConfig) => {
-			this.addCommand({
-				id: commandConfig.id,
-				name: commandConfig.name,
-				icon: commandConfig.icon,
-				editorCheckCallback: (checking: boolean, editor) => {
-					const condition = commandConfig.condition;
-					const conditionValue =
-						this.settings[condition as keyof dupliSettings];
-					if (conditionValue) {
-						if (!checking) {
-							if (commandConfig.direction != null) {
-								if (condition === "moveRight" || condition === "moveLeft") this.directionalMove(
-									editor,
-									commandConfig.direction
-								)
-								else
-									this.duplicateLine(
-										editor,
-										commandConfig.direction
-									);
-							}
-							else if (condition === "addNextOcc")
-								addNextOccurrence(editor);
-							else if (condition === "selAllOcc")
-								addAllOccurrences(editor);
-						}
-						return true;
-					}
-					return false;
-				},
-			});
+			const condition = commandConfig.condition;
+			const conditionValue =
+				this.settings[condition as keyof dupliSettings];
+			if (conditionValue) {
+				this.addCommandToEditor(commandConfig, condition)
+			}
 		});
 	}
+	addCommandToEditor(commandConfig: CommandConfig, condition: string) {
+	this.addCommand({
+		id: commandConfig.id,
+		name: commandConfig.name,
+		icon: commandConfig.icon,
+		editorCallback: (editor) => {
+			if (commandConfig.direction != null) {
+				if (condition === "moveRight" || condition === "moveLeft") {
+					this.directionalMove(editor, commandConfig.direction);
+				} else {
+					this.duplicateLine(editor, commandConfig.direction);
+				}
+			} else if (condition === "addNextOcc") {
+				addNextOccurrence(editor);
+			} else if (condition === "selAllOcc") {
+				addAllOccurrences(editor);
+			}
+		},
+	});
+}
 
 	async loadSettings() {
 		this.settings = {

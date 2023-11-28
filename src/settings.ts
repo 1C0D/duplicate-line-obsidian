@@ -44,14 +44,21 @@ export class DuplicateLineSettings extends PluginSettingTab {
 						this.plugin.settings[
 							commandConfig.condition as keyof dupliSettings
 						] = value;
-						// if (this.plugin.settings[
-						// 	commandConfig.condition as keyof dupliSettings
-						// ]) {
-						// 	this.plugin.addCommandHandler()
-						// }
-						// else {
-						// 	await (this.app as any).commands.removeCommand("enhance-youtube-links:enhance-youtube-links-process-text")//command id found in app.commands.commands...
-						// }
+
+						// commandsToCreate.forEach((commandConfig) => {
+						// 	const condition = commandConfig.condition;
+						// 	const conditionValue =
+						// 		this.settings[condition as keyof dupliSettings];
+
+						if (this.plugin.settings[
+							commandConfig.condition as keyof dupliSettings
+						]) {
+							const condition = commandConfig.condition;
+							this.plugin.addCommandToEditor(commandConfig, condition)
+						}
+						else {
+							await (this.app as any).commands.removeCommand(`duplicate-line:${commandConfig.id}`)//command id found in app.commands.commands...
+						}
 						await this.plugin.saveSettings();
 					});
 			});
