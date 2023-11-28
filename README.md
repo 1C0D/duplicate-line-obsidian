@@ -4,7 +4,7 @@ this plugin was at first a simple plugin to duplicate lines up and down
 then I added more options. Some options were greatly inspired by obsidian-tweaks. But I fixed a lot of bugs.  
 I tried to make some pull request on this repo but no answer. But thanks to him for many things.  
   
-All commands (can be disabled in settings):
+All commands (can be disabled in settings):  
 Duplicate Line Down, (recommanded shortcut shift alt ↓)  
 Duplicate Line Up, (recommanded shortcut shift alt ↑)  
 Duplicate Selection Down, (recommanded shortcut ctrl shift ↓)  
