@@ -1,3 +1,6 @@
+import { arrow_down_from_line, arrow_down_narrow_wide, arrow_right_from_line, arrow_up_from_line } from "icons";
+import { addIcon } from "obsidian";
+
 export * from "obsidian";
 
 export enum Direction {
@@ -47,6 +50,11 @@ export interface CommandConfig {
 	direction: Direction | null;
 	condition: string;
 }
+
+addIcon('arrow-down-narrow-wide', arrow_down_narrow_wide)
+addIcon('arrow-down-from-line', arrow_down_from_line)
+addIcon('arrow-down-narrow-wide', arrow_up_from_line)
+addIcon('arrow-right-narrow-wide', arrow_right_from_line)
 
 export const commandsToCreate: Array<CommandConfig> = [
 	{
@@ -134,3 +142,5 @@ declare module "obsidian" {
 		removeHighlights(cls: string): void;
 	}
 }
+
+

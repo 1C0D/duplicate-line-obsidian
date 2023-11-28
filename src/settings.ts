@@ -45,11 +45,6 @@ export class DuplicateLineSettings extends PluginSettingTab {
 							commandConfig.condition as keyof dupliSettings
 						] = value;
 
-						// commandsToCreate.forEach((commandConfig) => {
-						// 	const condition = commandConfig.condition;
-						// 	const conditionValue =
-						// 		this.settings[condition as keyof dupliSettings];
-
 						if (this.plugin.settings[
 							commandConfig.condition as keyof dupliSettings
 						]) {
