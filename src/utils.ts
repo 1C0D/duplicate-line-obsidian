@@ -3,7 +3,6 @@ import {
 	EditorPosition,
 	EditorRange,
 	EditorSelection,
-	EditorSelectionOrCaret,
 } from "obsidian";
 import { Direction } from "./types";
 import { sortBy } from "lodash";
