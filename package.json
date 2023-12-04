@@ -1,6 +1,6 @@
 {
 	"name": "duplicate-line",
-	"version": "2.2.3",
+	"version": "2.2.4",
 	"description": "Duplicate Line(s) Up Down, duplicate selection Up Down, right, left. Support Multicursor",
 	"main": "main.js",
 	"scripts": {
