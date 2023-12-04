@@ -53,8 +53,8 @@ export interface CommandConfig {
 
 addIcon('arrow-down-narrow-wide', arrow_down_narrow_wide)
 addIcon('arrow-down-from-line', arrow_down_from_line)
-addIcon('arrow-down-narrow-wide', arrow_up_from_line)
-addIcon('arrow-right-narrow-wide', arrow_right_from_line)
+addIcon('arrow-up-from-line', arrow_up_from_line)
+addIcon('arrow-right-from-line', arrow_right_from_line)
 
 export const commandsToCreate: Array<CommandConfig> = [
 	{
