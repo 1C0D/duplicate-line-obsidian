@@ -1,4 +1,4 @@
-import readline from "readline";
+import * as readline from "readline";
 import { execSync } from "child_process";
 
 export function acp() {
@@ -18,6 +18,7 @@ export function acp() {
         } catch (error) {
             console.error('Error:', error.message);
         }
+        process.exit()
     });
 }
 

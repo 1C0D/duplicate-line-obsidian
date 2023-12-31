@@ -29,7 +29,6 @@ export default class DuplicateLine extends Plugin {
 	newDirection: Direction | null;
 
 	async onload() {
-		console.log("tuttut")
 		await this.loadSettings();
 		this.addSettingTab(new DuplicateLineSettings(this.app, this));
 		this.createCommandsFromSettings();
