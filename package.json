@@ -31,7 +31,7 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"start": "tsx scripts/start.mts",
+		"start": "tsx scripts/start.mjs",
 		"version": "tsx scripts/update-version.mts",
 		"acp": "tsx scripts/acp.mts",
 		"test": "tsx scripts/test-plugin.mts"
