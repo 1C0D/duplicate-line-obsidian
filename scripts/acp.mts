@@ -11,6 +11,7 @@ export function acp() {
         rl.close();
         let cleanedInput = input.replace(/^['"`]|['"`]$/g, '');
         try {
+            execSync('npm run build')
             execSync('git add .');
             execSync(`git commit -am "${cleanedInput}"`);
             execSync('git push');
