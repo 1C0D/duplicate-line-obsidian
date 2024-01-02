@@ -7,23 +7,28 @@ const currentDir = process.cwd();
 const rootDir = path.resolve(currentDir, '../');
 
 // Fonction pour copier le dossier 'scripts' vers le dossier root
-function copyScriptsToRoot() {
-    const scriptsDir = path.join(currentDir, 'scripts');
-    const scriptsExist = fs.existsSync(scriptsDir);
+function copyFolderToRoot(folderName) {
+    const sourceDir = path.join(currentDir, folderName);
+    const sourceExists = fs.existsSync(sourceDir);
 
-    if (scriptsExist) {
-        const destinationDir = path.join(rootDir, 'scripts');
+    if (sourceExists) {
+        const destinationDir = path.join(rootDir, folderName);
         const destinationExists = fs.existsSync(destinationDir);
 
         if (destinationExists) {
             fs.removeSync(destinationDir);
         }
 
-        fs.copySync(scriptsDir, destinationDir, { overwrite: true });
-        console.log('Le dossier "scripts" a été copié avec succès vers le dossier root.');
+        fs.copySync(sourceDir, destinationDir, { overwrite: true });
+        console.log(`Le dossier "${folderName}" a été copié avec succès vers le dossier root.`);
     } else {
-        console.log('Le dossier "scripts" n\'existe pas dans le dossier courant.');
+        console.log(`Le dossier "${folderName}" n'existe pas dans le dossier courant.`);
     }
+}
+
+function copyScriptsToRoot() {
+    copyFolderToRoot('scripts');
+    copyFolderToRoot('.github');
 }
 
 // Fonction pour mettre à jour ou créer 'scripts' dans package.json
