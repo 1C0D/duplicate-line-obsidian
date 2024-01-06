@@ -24,7 +24,8 @@ function askQuestion(question: string): Promise<string> {
         const input: string = await askQuestion('Enter commit message: ');
         rl.close();
 
-        const cleanedInput = input.replace(/^["`]$/g, "'");
+        const cleanedInput = input.replace(/^["`]$/g, "'").replace(/\r\n/g, '\n');  
+        
         execSync('git add .');
         execSync(`git commit -m "${cleanedInput}"`);
         execSync('git push');

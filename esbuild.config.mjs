@@ -1,6 +1,8 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
+import * as dotenv from 'dotenv';
+dotenv.config()
 
 const banner =
 	`/*
@@ -38,6 +40,9 @@ const context = await esbuild.context({
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
 	outfile: "main.js",
+	define: {
+		'process.env.DEBUG': JSON.stringify(prod ? "false" : "true")
+	},
 });
 
 if (prod) {

@@ -49,6 +49,7 @@ export interface CommandConfig {
 	icon: string;
 	direction: Direction | null;
 	condition: string;
+	desc: string
 }
 
 addIcon('arrow-down-narrow-wide', arrow_down_narrow_wide)
@@ -63,6 +64,8 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-down-from-line",
 		direction: Direction.Down,
 		condition: "lineDown",
+		desc: "recommanded shortcut shift alt ↓"
+
 	},
 	{
 		id: "duplicate-line-up",
@@ -70,6 +73,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-up-from-line",
 		direction: Direction.Up,
 		condition: "lineUp",
+		desc: "recommanded shortcut shift alt ↑"
 	},
 	{
 		id: "duplicate-selection-down",
@@ -77,6 +81,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-down",
 		direction: Direction.SelDown,
 		condition: "selectionDown",
+		desc: "recommanded shortcut ctrl shift ↓"
 	},
 	{
 		id: "duplicate-selection-up",
@@ -84,6 +89,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-up",
 		direction: Direction.SelUp,
 		condition: "selectionUp",
+		desc: "recommanded shortcut ctrl shift ↑"
 	},
 	{
 		id: "duplicate-line-right",
@@ -91,6 +97,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-right-from-line",
 		direction: Direction.Right,
 		condition: "selectionRight",
+		desc: "recommanded shortcut ctrl shift →"
 	},
 	// {
 	// 	id: "duplicate-line-left",
@@ -105,6 +112,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-down-right",
 		direction: Direction.RightDown,
 		condition: "mixRightDown",
+		desc: "if no selection: duplicate line down, else duplicate selection right "
 	},
 	{
 		id: "directional-move-right",
@@ -112,6 +120,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-right",
 		direction: Direction.Right,
 		condition: "moveRight",
+		desc: "recommanded shortcut alt →"
 	},
 	{
 		id: "directional-move-left",
@@ -119,6 +128,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-left",
 		direction: Direction.Left,
 		condition: "moveLeft",
+		desc: "recommanded shortcut alt ←"
 	},
 	{
 		id: "select-next-occurence",
@@ -126,6 +136,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "arrow-down-narrow-wide",
 		direction: null,
 		condition: "addNextOcc",
+		desc: "recommanded shortcut ctrl D"
 	},
 	{
 		id: "select-all-occurence",
@@ -133,6 +144,7 @@ export const commandsToCreate: Array<CommandConfig> = [
 		icon: "bar-chart-horizontal",
 		direction: null,
 		condition: "selAllOcc",
+		desc: "recommanded shortcut ctrl shift L"
 	},
 ];
 

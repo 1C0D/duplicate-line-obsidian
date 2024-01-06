@@ -1,7 +1,15 @@
 import * as readline from 'readline';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import { execSync } from 'child_process';
 import { checkManifest, createPathandCopy, getEnv, isVaultPathValid, promptNewPath } from './test-plugin-utils.mjs';
+
+const currentEvent = process.env.npm_lifecycle_event;
+console.log(`Starting the ${currentEvent} process...\n`);
+
+console.log("npm run build...");
+execSync('npm run build', { stdio: 'inherit' });
+console.log("npm run build successful.\n");
 
 // Load .env file
 dotenv.config()
@@ -30,11 +38,15 @@ if (await isVaultPathValid(vaultPath)) {
     rl.question(`Current vault path: ${vaultPath}\nDo you want to enter a different vault path? (Yes/No): `, async (answer) => {
         if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
             createPathandCopy(rl, targetPath);
+            console.log("plugin installed in dest vault")
+
         } else {
             await promptNewPath(rl, targetPath);
         }
     });
 } else {
     createPathandCopy(rl, targetPath);
+    console.log("plugin installed in dest vault")
 }
+
 

@@ -11,7 +11,6 @@ export class DuplicateLineSettings extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl("h2", { text: "Duplicate Line" });
 
 		new Setting(containerEl)
 			.setName("Add a space before right duplication")
@@ -29,15 +28,12 @@ export class DuplicateLineSettings extends PluginSettingTab {
 			const setting = new Setting(containerEl).setName(
 				commandConfig.name
 			);
-			if (commandConfig.condition === "mixRightDown")
-				setting.setDesc(
-					"if no selection: duplicate line down, else duplicate selection right "
-				);
+			setting.setDesc(commandConfig.desc as keyof dupliSettings)
 			setting.addToggle((toggle) => {
 				toggle
 					.setValue(
 						this.plugin.settings[
-							commandConfig.condition as keyof dupliSettings
+						commandConfig.condition as keyof dupliSettings
 						]
 					)
 					.onChange(async (value) => {
