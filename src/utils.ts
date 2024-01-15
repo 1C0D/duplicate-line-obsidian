@@ -3,9 +3,11 @@ import {
 	EditorPosition,
 	EditorRange,
 	EditorSelection,
+	MarkdownView,
 } from "obsidian";
 import { Direction } from "./types";
 import { sortBy } from "lodash";
+import DuplicateLine from "./main";
 
 export function selectionToLine(
 	editor: Editor,
@@ -120,3 +122,11 @@ export const getSelectionContent = (
 	}
 	return { wordRange: null, word: "", isWordSelected: false };
 };
+
+
+export function getEditor(plugin: DuplicateLine) {
+	const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+	if (!activeView) return
+	const editor = activeView.editor
+	return editor
+}

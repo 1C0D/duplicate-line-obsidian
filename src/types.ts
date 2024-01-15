@@ -13,6 +13,7 @@ export enum Direction {
 	RightDown,
 }
 
+
 export interface dupliSettings {
 	addSpaceBetween: boolean;
 	lineDown: boolean;
@@ -26,6 +27,10 @@ export interface dupliSettings {
 	mixRightDown: boolean;
 	addNextOcc: boolean;
 	selAllOcc: boolean;
+	showOccurences: boolean;
+	matchCase: boolean;
+	color: string;
+	fontSize: number;
 }
 
 export const DEFAULT_SETTINGS: dupliSettings = {
@@ -41,6 +46,10 @@ export const DEFAULT_SETTINGS: dupliSettings = {
 	mixRightDown: false,
 	addNextOcc: true,
 	selAllOcc: true,
+	showOccurences: true,
+	matchCase: false,
+	color: "#C6AB85",
+	fontSize: 1.2
 };
 
 export interface CommandConfig {

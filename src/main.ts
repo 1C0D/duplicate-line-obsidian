@@ -1,5 +1,4 @@
-// todo improve add remove commands (hotkey are still visibles)
-// add recommanded hotkeys in settings desc
+// check find all occurrences and next occurence algo
 import {
 	Editor,
 	EditorChange,
@@ -23,15 +22,22 @@ import {
 } from "./utils";
 import { addNextOccurrence } from "./AddNextOccurrence";
 import { addAllOccurrences } from "./AddAllOccurrences";
+import { handleSelectionChange } from "./status-bar-occurences";
 
 export default class DuplicateLine extends Plugin {
 	settings: dupliSettings;
 	newDirection: Direction | null;
+	statusBarItemEl: HTMLElement | null;
+	selectionRegex: RegExp | null;
+	nb: number
 
 	async onload() {
 		await this.loadSettings();
+
 		this.addSettingTab(new DuplicateLineSettings(this.app, this));
 		this.createCommandsFromSettings();
+		//status bar occurences
+		this.registerDomEvent(document, 'selectionchange', () => handleSelectionChange(this));
 	}
 
 	createCommandsFromSettings() {
@@ -45,25 +51,25 @@ export default class DuplicateLine extends Plugin {
 		});
 	}
 	addCommandToEditor(commandConfig: CommandConfig, condition: string) {
-	this.addCommand({
-		id: commandConfig.id,
-		name: commandConfig.name,
-		icon: commandConfig.icon,
-		editorCallback: (editor) => {
-			if (commandConfig.direction != null) {
-				if (condition === "moveRight" || condition === "moveLeft") {
-					this.directionalMove(editor, commandConfig.direction);
-				} else {
-					this.duplicateLine(editor, commandConfig.direction);
+		this.addCommand({
+			id: commandConfig.id,
+			name: commandConfig.name,
+			icon: commandConfig.icon,
+			editorCallback: (editor) => {
+				if (commandConfig.direction != null) {
+					if (condition === "moveRight" || condition === "moveLeft") {
+						this.directionalMove(editor, commandConfig.direction);
+					} else {
+						this.duplicateLine(editor, commandConfig.direction);
+					}
+				} else if (condition === "addNextOcc") {
+					addNextOccurrence(editor);
+				} else if (condition === "selAllOcc") {
+					addAllOccurrences(editor);
 				}
-			} else if (condition === "addNextOcc") {
-				addNextOccurrence(editor);
-			} else if (condition === "selAllOcc") {
-				addAllOccurrences(editor);
-			}
-		},
-	});
-}
+			},
+		});
+	}
 
 	async loadSettings() {
 		this.settings = {
@@ -382,3 +388,10 @@ export default class DuplicateLine extends Plugin {
 		}
 	}
 }
+
+
+
+
+
+
+
