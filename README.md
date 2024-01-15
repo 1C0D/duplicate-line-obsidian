@@ -1,4 +1,9 @@
 # duplicate-line(s) / Add next occurence
+
+- Select next occurrence and all occurences updated to work on every selection (if no selection word at cursor position)
+- new feature to show number of occurences on selection in status bar (settings color size)
+Remember: All features can be switched on/off in settings
+[LastFeaturesDemo](https://youtu.be/gJmA36TX7GU)
   
 this plugin was at first a simple plugin to duplicate lines up and down  
 then I added more options. Some options were greatly inspired by obsidian-tweaks. But I fixed a lot of bugs.  
