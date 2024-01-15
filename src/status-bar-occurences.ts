@@ -75,5 +75,9 @@ function compileRegex(plugin: DuplicateLine, selection: string) {
         Console.log("yes")
         modifiers += 'i';
     }
-    plugin.selectionRegex = new RegExp(selection, modifiers);
+    try {
+        plugin.selectionRegex = new RegExp(selection, modifiers);
+    } catch (error) {
+        console.error(error);
+    }
 }

@@ -9,7 +9,7 @@ export const addNextOccurrence = (editor: Editor) => {
 		editor,
 		selections
 	);
-	if (wordRange !== null) {
+	if (wordRange !== null && word) {
 		const doc = getContent(editor);
 		const [_,endPos] = rangeToPositions(wordRange);
 		const pos = editor.posToOffset(endPos);

@@ -5,7 +5,7 @@ export const addAllOccurrences = (editor: Editor) => {
 	let selections = editor.listSelections();
 	const { word, wordRange } = getSelectionContent(editor, selections);
 	selections = [];
-	if (wordRange !== null) {
+	if (wordRange !== null && word) {
 		const doc = getContent(editor);
 		let nextOccurrenceIndex = doc.indexOf(word);
 

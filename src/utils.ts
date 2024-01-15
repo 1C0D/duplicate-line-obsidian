@@ -8,6 +8,7 @@ import {
 import { Direction } from "./types";
 import { sortBy } from "lodash";
 import DuplicateLine from "./main";
+import { Console } from "./Console";
 
 export function selectionToLine(
 	editor: Editor,
@@ -31,9 +32,9 @@ export function selectionToLine(
 	) {
 		return isEmptySelection
 			? {
-					from: { line: range.to.line, ch: 0 },
-					to: { line: range.to.line, ch: toLength },
-			  }
+				from: { line: range.to.line, ch: 0 },
+				to: { line: range.to.line, ch: toLength },
+			}
 			: range;
 	} else {
 		// selection right/left
@@ -108,8 +109,21 @@ export const getSelectionContent = (
 	ed: Editor,
 	selections: EditorSelection[]
 ) => {
-	const lastSelection = selections[selections.length - 1];
-	const wordRange = ed.wordAt(lastSelection.head);
+
+	// EditorSelection anchor: EditorPosition; head: EditorPosition
+	const lastSelection: EditorSelection = selections[selections.length - 1];
+	const selection = ed.getSelection()
+	let wordRange;
+
+	if (selection) {
+		Console.log("lastSelection", lastSelection)
+		wordRange = selectionToRange(lastSelection, true)
+	} else {
+		wordRange = ed.wordAt(lastSelection.head)
+	}
+	Console.log("wordRange", wordRange)
+
+	// wordRange: EditorRange from: EditorPosition to: EditorPosition;
 	if (wordRange != null) {
 		const { from, to } = wordRange;
 		const word = ed.getRange(from, to);
