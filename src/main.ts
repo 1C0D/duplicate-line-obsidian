@@ -3,6 +3,7 @@ import {
 	EditorChange,
 	EditorRange,
 	EditorTransaction,
+	Platform,
 	Plugin,
 } from "obsidian";
 import { DuplicateLineSettings } from "./settings";
@@ -36,7 +37,9 @@ export default class DuplicateLine extends Plugin {
 		this.addSettingTab(new DuplicateLineSettings(this.app, this));
 		this.createCommandsFromSettings();
 		//status bar occurences
-		this.registerDomEvent(document, 'selectionchange', () => handleSelectionChange(this));
+		if (Platform.isDesktopApp) {
+			this.registerDomEvent(document, 'selectionchange', () => handleSelectionChange(this));
+		}
 	}
 
 	createCommandsFromSettings() {

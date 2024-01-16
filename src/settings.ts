@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Platform, PluginSettingTab, Setting } from "obsidian";
 import { CommandConfig, commandsToCreate, dupliSettings } from "./types";
 import DuplicateLine from "./main";
 
@@ -12,19 +12,20 @@ export class DuplicateLineSettings extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl)
-			.setName("Show selection occurences in status bar")
-			.setDesc("select at least 3 characters")
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settings.showOccurences)
-					.onChange(async (value) => {
-						this.plugin.settings.showOccurences = value;
-						await this.plugin.saveSettings();
-					});
+		if (Platform.isDesktopApp) {
+			new Setting(containerEl)
+				.setName("Show selection occurences in status bar")
+				.setDesc("select at least 3 characters")
+				.addToggle((toggle) => {
+					toggle
+						.setValue(this.plugin.settings.showOccurences)
+						.onChange(async (value) => {
+							this.plugin.settings.showOccurences = value;
+							await this.plugin.saveSettings();
+						});
 
-			});
-			
+				});
+
 			const setting = new Setting(containerEl)
 				.setName("Set color & size")
 				.addColorPicker(color => color
@@ -47,6 +48,7 @@ export class DuplicateLineSettings extends PluginSettingTab {
 							await this.plugin.saveSettings();
 						});
 				})
+		}
 
 		new Setting(containerEl)
 			.setName("Add a space before right duplication")
