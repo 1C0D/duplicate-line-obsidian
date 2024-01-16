@@ -1,4 +1,3 @@
-// check find all occurrences and next occurence algo
 import {
 	Editor,
 	EditorChange,
