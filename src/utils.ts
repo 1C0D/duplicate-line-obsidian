@@ -116,12 +116,12 @@ export const getSelectionContent = (
 	let wordRange;
 
 	if (selection) {
-		Console.log("lastSelection", lastSelection)
+		Console.debug("lastSelection", lastSelection)
 		wordRange = selectionToRange(lastSelection, true)
 	} else {
 		wordRange = ed.wordAt(lastSelection.head)
 	}
-	Console.log("wordRange", wordRange)
+	Console.debug("wordRange", wordRange)
 
 	// wordRange: EditorRange from: EditorPosition to: EditorPosition;
 	if (wordRange != null) {

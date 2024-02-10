@@ -2,6 +2,7 @@ import { debounce } from "obsidian";
 import DuplicateLine from "./main";
 import { getEditor, getContent } from "./utils";
 import { Console } from "./Console";
+import { escapeRegExp } from "lodash";
 
 export const handleSelectionChange = (plugin: DuplicateLine) => {
     reset(plugin)
@@ -53,31 +54,29 @@ export function getOccurrences(plugin: DuplicateLine): number {
     if (!selection) return 0;
 
     if (!plugin.selectionRegex) {
-        Console.log("compile regex 1", selection)
+        Console.debug("compile regex 1", selection)
         compileRegex(plugin, selection);
     }
-    if (!plugin.selectionRegex) {
-        Console.log("selection regex is null");
-    } else if (plugin.selectionRegex.source !== selection) {
-        Console.log("compile regex 2", selection);
+    if (plugin.selectionRegex!.source !== selection) {
+        Console.debug("compile regex 2", selection);
         compileRegex(plugin, selection);
     }
 
     const matches = [...text.matchAll(plugin.selectionRegex!)];
 
-    Console.log("matches length", matches.length)
+    Console.debug("matches length", matches.length)
     return matches.length;
 }
 
 function compileRegex(plugin: DuplicateLine, selection: string) {
     let modifiers = 'g';
     if (!plugin.settings.matchCase) {
-        Console.log("yes")
+        // Console.debug("yes")
         modifiers += 'i';
     }
     try {
-        plugin.selectionRegex = new RegExp(selection, modifiers);
+        plugin.selectionRegex = new RegExp(escapeRegExp(selection), modifiers);
     } catch (error) {
-        console.error(error);
+        console.warn(error);
     }
 }
